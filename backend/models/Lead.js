@@ -1,0 +1,3 @@
+import mongoose from 'mongoose';
+const leadSchema=new mongoose.Schema({name:{type:String,required:true,trim:true,maxlength:100},phone:{type:String,required:true,trim:true,maxlength:30},email:{type:String,required:true,lowercase:true,trim:true,maxlength:160},company:{type:String,trim:true,maxlength:160},service:{type:String,required:true,trim:true},budget:{type:String,trim:true},message:{type:String,required:true,maxlength:4000},contactPreference:{type:String,enum:['Phone','Email','WhatsApp'],default:'Phone'},source:{type:String,default:'website'},status:{type:String,enum:['new','contacted','qualified','proposal-sent','won','lost'],default:'new',index:true}},{timestamps:true});
+export const Lead=mongoose.model('Lead',leadSchema);

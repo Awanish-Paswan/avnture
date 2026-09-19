@@ -1,0 +1,17 @@
+{
+  "name": "avnture-technologies",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": ["frontend", "backend"],
+  "scripts": {
+    "dev": "concurrently -n WEB,API -c cyan,magenta \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "build": "npm run build -w frontend && npm run build -w backend",
+    "start": "npm run start -w backend",
+    "check": "npm run check -w frontend && npm run check -w backend",
+    "seed:admin": "npm run seed:admin -w backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -1,0 +1,38 @@
+export type Project = {
+  _id: string;
+  title: string;
+  slug: string;
+  shortDescription: string;
+  fullDescription?: string;
+  industry?: string;
+  clientType?: string;
+  services?: string[];
+  technologies?: string[];
+  features?: string[];
+  challenge?: string;
+  solution?: string;
+  results?: string;
+  thumbnail?: string;
+  gallery?: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+  featured?: boolean;
+  status?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+};
+export type BlogPost = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content?: string;
+  featuredImage?: string;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  status?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  publishedAt?: string;
+};

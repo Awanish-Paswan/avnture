@@ -1,0 +1,5 @@
+import bcrypt from 'bcryptjs'; import jwt from 'jsonwebtoken'; import { User } from '../models/User.js'; import { AppError } from '../middleware/error.js';
+const cookieOptions=()=>({httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:process.env.NODE_ENV==='production'?'none':'lax',maxAge:8*60*60*1000,path:'/'});
+export async function login(req,res,next){try{const user=await User.findOne({email:req.body.email.toLowerCase()}).select('+passwordHash');if(!user||!(await bcrypt.compare(req.body.password,user.passwordHash)))throw new AppError('Invalid email or password.',401);const token=jwt.sign({sub:user.id,role:user.role},process.env.JWT_SECRET,{expiresIn:'8h',issuer:'avnture-technologies'});res.cookie('avnture_admin',token,cookieOptions()).json({success:true,message:'Signed in.',data:{name:user.name,email:user.email,role:user.role}});}catch(e){next(e);}}
+export function logout(req,res){res.clearCookie('avnture_admin',cookieOptions()).json({success:true,message:'Signed out.',data:null});}
+export function me(req,res){res.json({success:true,message:'Authenticated.',data:{name:req.user.name,email:req.user.email,role:req.user.role}});}

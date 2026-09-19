@@ -1,0 +1,3 @@
+export class AppError extends Error { constructor(message,status=500,errors=undefined){super(message);this.status=status;this.errors=errors;} }
+export function notFound(req,res,next){next(new AppError(`Route not found: ${req.method} ${req.originalUrl}`,404));}
+export function errorHandler(error,req,res,next){let status=error.status||500;let message=error.message||'Internal server error.';if(error.name==='ValidationError'){status=400;message='Validation failed.';}if(error.code===11000){status=409;message='A record with that value already exists.';}const body={success:false,message,errors:error.errors};if(process.env.NODE_ENV!=='production')body.stack=error.stack;res.status(status).json(body);}

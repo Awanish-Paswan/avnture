@@ -1,0 +1,4 @@
+import mongoose from 'mongoose';
+const projectSchema=new mongoose.Schema({title:{type:String,required:true,trim:true,maxlength:140},slug:{type:String,required:true,unique:true,index:true,lowercase:true,trim:true},shortDescription:{type:String,required:true,maxlength:320},fullDescription:{type:String,default:''},industry:{type:String,trim:true},clientType:{type:String,trim:true},services:[String],technologies:[String],features:[String],challenge:String,solution:String,results:String,thumbnail:String,gallery:[String],liveUrl:String,githubUrl:String,featured:{type:Boolean,default:false},status:{type:String,enum:['draft','published','archived'],default:'draft',index:true},seoTitle:{type:String,maxlength:70},seoDescription:{type:String,maxlength:170}},{timestamps:true});
+projectSchema.index({status:1,featured:-1,createdAt:-1});
+export const Project=mongoose.model('Project',projectSchema);
