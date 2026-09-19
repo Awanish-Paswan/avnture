@@ -59,7 +59,7 @@ export function Header() {
           </a>
         </div>
         <button
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-slate-200 lg:hidden"
+          className="grid h-10 w-10 shrink-0 touch-manipulation place-items-center rounded-full border border-slate-200 lg:hidden"
           onClick={() => setOpen(!open)}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
@@ -68,7 +68,7 @@ export function Header() {
         </button>
       </div>
       <div
-        className={`fixed inset-x-0 top-[77px] h-[calc(100vh-77px)] transition-colors duration-300 lg:hidden ${
+        className={`fixed inset-x-0 top-[77px] h-[calc(100dvh-77px)] overflow-hidden overscroll-contain transition-colors duration-300 lg:hidden ${
           open
             ? "visible bg-slate-950/35"
             : "pointer-events-none invisible bg-transparent"
@@ -77,7 +77,7 @@ export function Header() {
         aria-hidden={!open}
       >
         <nav
-          className={`ml-auto flex h-full w-[min(88vw,360px)] flex-col bg-white px-6 py-8 shadow-2xl transition-transform duration-300 ease-out ${
+          className={`ml-auto flex h-full w-[88vw] max-w-[360px] flex-col overflow-y-auto bg-white px-6 py-8 shadow-2xl transition-transform duration-300 ease-out ${
             open ? "translate-x-0" : "translate-x-full"
           }`}
           aria-label="Mobile navigation"
