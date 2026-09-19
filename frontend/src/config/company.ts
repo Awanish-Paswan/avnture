@@ -15,7 +15,7 @@ export const contactHref = {
   whatsapp: company.whatsapp
     ? `https://wa.me/${company.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hi Avnture Technologies, I'm interested in discussing a project.")}`
     : "/contact",
-  talkToExpert: company.whatsapp
-    ? `https://wa.me/${company.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hi Avnture Technologies, I'd like to talk to an expert about my project.")}`
+  freeConsultation: company.whatsapp
+    ? `https://wa.me/${company.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hi Avnture Technologies, I would like to schedule a free consultation for my project.")}`
     : "/contact",
 };
