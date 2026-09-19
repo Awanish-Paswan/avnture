@@ -81,10 +81,9 @@ export function Header() {
               target="_blank"
               rel="noreferrer"
               data-event="whatsapp_click"
-              className="button-primary mt-8"
+              className="mt-6 inline-flex min-h-11 self-start items-center gap-2 rounded-full bg-brand px-4 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
             >
-              <MessageCircle size={18} /> Talk to an Expert
-              <ArrowUpRight size={17} />
+              <MessageCircle size={16} /> Talk to an Expert
             </a>
           </nav>
         </div>
