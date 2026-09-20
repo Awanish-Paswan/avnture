@@ -46,23 +46,47 @@ export async function uploadImage(req, res, next) {
   try {
     if (!req.file) throw new AppError("Choose an image to upload.", 422);
 
-    const optimized = await sharp(req.file.buffer, { failOn: "error" })
-      .rotate()
-      .resize({
-        width: 1600,
-        height: 1200,
-        fit: "inside",
-        withoutEnlargement: true,
-      })
-      .webp({ quality: 82, effort: 5 })
-      .toBuffer();
+    let optimized;
+    try {
+      optimized = await sharp(req.file.buffer, { failOn: "error" })
+        .rotate()
+        .resize({
+          width: 1600,
+          height: 1200,
+          fit: "inside",
+          withoutEnlargement: true,
+        })
+        .webp({ quality: 82, effort: 5 })
+        .toBuffer();
+    } catch {
+      throw new AppError(
+        "This image could not be decoded. Export it again as a standard JPG, PNG, WebP or AVIF file.",
+        422,
+      );
+    }
 
     let url;
     let storage;
     if (cloudinaryConfigured()) {
-      url = await saveToCloudinary(optimized);
+      try {
+        url = await saveToCloudinary(optimized);
+      } catch (error) {
+        console.error(
+          "Cloudinary image upload failed:",
+          error?.message || error,
+        );
+        throw new AppError(
+          "The image was processed, but Cloudinary rejected the upload. Verify the CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET values in Render.",
+          502,
+        );
+      }
       storage = "cloudinary";
     } else {
+      if (process.env.NODE_ENV === "production")
+        throw new AppError(
+          "Image storage is not configured. Add the Cloudinary environment variables in Render.",
+          503,
+        );
       await fs.mkdir(uploadsDirectory, { recursive: true });
       const filename = `project-${Date.now()}-${randomUUID()}.webp`;
       await fs.writeFile(path.join(uploadsDirectory, filename), optimized);
@@ -84,11 +108,7 @@ export async function uploadImage(req, res, next) {
     });
   } catch (error) {
     if (error instanceof AppError) return next(error);
-    next(
-      new AppError(
-        "The image could not be processed. Use a valid JPG, PNG, WebP or AVIF image.",
-        422,
-      ),
-    );
+    console.error("Unexpected image upload failure:", error);
+    next(new AppError("The image could not be uploaded.", 500));
   }
 }

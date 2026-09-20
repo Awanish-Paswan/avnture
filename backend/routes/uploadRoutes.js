@@ -8,7 +8,9 @@ export const uploadRouter = Router();
 
 const allowedTypes = new Set([
   "image/jpeg",
+  "image/jpg",
   "image/png",
+  "image/x-png",
   "image/webp",
   "image/avif",
 ]);
