@@ -1,19 +1,24 @@
 import React from "react";
-import { hydrateRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { InitialDataProvider } from "./ssr/InitialData";
 import "./styles/index.css";
-hydrateRoot(
-  document.getElementById("root")!,
+const rootElement = document.getElementById("root")!;
+const application = (
   <React.StrictMode>
     <InitialDataProvider data={window.__INITIAL_DATA__ || {}}>
       <BrowserRouter>
         <App />
       </BrowserRouter>
     </InitialDataProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
+if (rootElement.firstElementChild) {
+  hydrateRoot(rootElement, application);
+} else {
+  createRoot(rootElement).render(application);
+}
 const ga = import.meta.env.VITE_GA_MEASUREMENT_ID;
 if (ga) {
   const s = document.createElement("script");

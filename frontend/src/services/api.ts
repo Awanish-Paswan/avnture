@@ -1,9 +1,19 @@
 import type { BlogPost, Project } from "../types";
 const base = import.meta.env.VITE_API_URL || "";
+const adminTokenKey = "avnture_admin_token";
+const adminToken = () =>
+  typeof window === "undefined"
+    ? null
+    : window.sessionStorage.getItem(adminTokenKey);
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = adminToken();
   const response = await fetch(`${base}${path}`, {
     credentials: "include",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
+    },
     ...options,
   });
   const body = await response.json().catch(() => ({}));
@@ -21,12 +31,24 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  login: (email: string, password: string) =>
-    request<{ name: string; role: string }>("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    }),
-  logout: () => request("/api/auth/logout", { method: "POST" }),
+  login: async (email: string, password: string) => {
+    const data = await request<{ name: string; role: string; token: string }>(
+      "/api/auth/login",
+      {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      },
+    );
+    window.sessionStorage.setItem(adminTokenKey, data.token);
+    return data;
+  },
+  logout: async () => {
+    try {
+      return await request("/api/auth/logout", { method: "POST" });
+    } finally {
+      window.sessionStorage.removeItem(adminTokenKey);
+    }
+  },
   me: () => request<{ name: string; role: string }>("/api/auth/me"),
   adminList: <T>(resource: string) =>
     request<T[]>(`/api/${resource}?admin=true`),
@@ -50,9 +72,11 @@ export const api = {
   uploadImage: async (file: File) => {
     const form = new FormData();
     form.append("image", file);
+    const token = adminToken();
     const response = await fetch(`${base}/api/uploads/images`, {
       method: "POST",
       credentials: "include",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       body: form,
     });
     const body = await response.json().catch(() => ({}));
