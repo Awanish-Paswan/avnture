@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --watch --env-file=../.env server.js",
     "build": "node -e \"console.log('Backend uses native Node.js ESM; no compilation required.')\"",
-    "start": "node --env-file=../.env server.js",
+    "start": "node server.js",
     "check": "node --check server.js && node --check app.js",
     "seed:admin": "node --env-file=../.env scripts/seedAdmin.js"
   },
