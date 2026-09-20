@@ -42,6 +42,29 @@ async function saveToCloudinary(buffer) {
   });
 }
 
+function cloudinaryFailure(error) {
+  const message = String(error?.message || error?.error?.message || "");
+  const code = String(error?.code || "");
+  const httpCode = Number(error?.http_code || error?.status || 0);
+
+  console.error("Cloudinary image upload failed:", {
+    name: error?.name,
+    code: code || undefined,
+    httpCode: httpCode || undefined,
+    message: message || undefined,
+  });
+
+  if (["ETIMEDOUT", "ECONNRESET", "ENOTFOUND"].includes(code))
+    return "Cloudinary could not be reached. Retry the upload and check Render's outbound connection if it continues.";
+  if (/signature/i.test(message))
+    return "Cloudinary reported an invalid signature. Replace CLOUDINARY_API_SECRET in Render with a freshly copied value.";
+  if (httpCode === 401 || /api.?key|credentials|authentication/i.test(message))
+    return "Cloudinary rejected the API credentials. Verify the cloud name and replace the API key and secret in Render.";
+  if (httpCode === 403 || /disabled|restricted|permission/i.test(message))
+    return "Cloudinary denied this upload. Check that the product environment and API key allow image uploads.";
+  return `Cloudinary rejected the upload${httpCode ? ` (HTTP ${httpCode})` : ""}. Check the Render log entry for the exact Cloudinary response.`;
+}
+
 export async function uploadImage(req, res, next) {
   try {
     if (!req.file) throw new AppError("Choose an image to upload.", 422);
@@ -71,14 +94,7 @@ export async function uploadImage(req, res, next) {
       try {
         url = await saveToCloudinary(optimized);
       } catch (error) {
-        console.error(
-          "Cloudinary image upload failed:",
-          error?.message || error,
-        );
-        throw new AppError(
-          "The image was processed, but Cloudinary rejected the upload. Verify the CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET values in Render.",
-          502,
-        );
+        throw new AppError(cloudinaryFailure(error), 502);
       }
       storage = "cloudinary";
     } else {
